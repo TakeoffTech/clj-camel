@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [clj-camel.core :as c]
             [clj-camel.util :as cu]
-            [clj-camel.test-util :as test-util]
+            [clj-camel.test-utils :as test-utils]
             [clojure.xml :as xml]
             [clojure.data]
             [clojure.java.io :as io]))
@@ -15,9 +15,9 @@
                               (c/log "after idempotent-consumer")
                               (c/to "direct:result"))
              (cu/dump-route-to-xml)
-             (test-util/str->input-stream)
+             (test-utils/str->input-stream)
              (xml/parse)
-             (test-util/remove-ids))
+             (test-utils/remove-ids))
          (-> "idempotent-consumer.xml"
              (io/resource)
              (io/input-stream)

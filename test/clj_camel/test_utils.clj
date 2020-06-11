@@ -1,4 +1,4 @@
-(ns clj-camel.test-util
+(ns clj-camel.test-utils
   (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
             [com.rpl.specter :as specter]
