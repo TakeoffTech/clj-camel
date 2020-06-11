@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route customId="true" id="1">
+        <from uri="direct:test"/>
+        <doTry id="1">
+            <to id="1" uri="http://test-http"/>
+            <doCatch id="1">
+                <log id="1" message="handle exception"/>
+                <log id="1" message="handle exception2"/>
+            </doCatch>
+            <doFinally id="1">
+                <log id="1" message="finally"/>
+                <log id="1" message="finally2"/>
+            </doFinally>
+        </doTry>
+        <log id="1" message="after do-try"/>
+    </route>
+</routes>

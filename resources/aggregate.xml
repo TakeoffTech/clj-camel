@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route customId="false" id="1">
+        <from uri="direct:test"/>
+        <setBody id="1">
+            <constant>test</constant>
+        </setBody>
+        <aggregate completionSize="1000" completionTimeout="1000" completionTimeoutCheckerInterval="1000" id="1">
+            <correlationExpression>
+                <expressionDefinition/>
+            </correlationExpression>
+            <completionPredicate>
+                <expressionDefinition/>
+            </completionPredicate>
+            <log id="1" message="after aggregating"/>
+            <to id="1" uri="direct:result"/>
+        </aggregate>
+    </route>
+</routes>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route customId="true" id="1">
+        <from uri="direct:test"/>
+        <to id="1" uri="http://test-http"/>
+        <filter id="1">
+            <expressionDefinition>clj_camel.core.proxy$java.lang.Object$Predicate</expressionDefinition>
+            <log id="1" message="Filtered ... ${body}"/>
+            <to id="1" uri="direct:result"/>
+        </filter>
+        <process customId="true" id="1"/>
+    </route>
+</routes>

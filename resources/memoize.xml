@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route customId="true" id="1">
+        <from uri="direct:test"/>
+        <setBody id="1">
+            <constant>x-token</constant>
+        </setBody>
+        <log id="1" message="x-token requested: ${body}"/>
+        <policy id="1">
+            <setBody id="1">
+                <constant>result2</constant>
+            </setBody>
+            <log id="1" message="Populate cache with ${body}"/>
+        </policy>
+        <log id="1" message="x-token result: ${body}"/>
+        <to id="1" uri="direct:result"/>
+    </route>
+</routes>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route customId="true" id="1">
+        <from uri="direct:test"/>
+        <choice id="1">
+            <when id="1">
+                <expressionDefinition>clj_camel.core.proxy$java.lang.Object$Predicate</expressionDefinition>
+                <log id="1" message="when 1"/>
+                <process customId="true" id="1"/>
+            </when>
+            <when id="1">
+                <expressionDefinition>clj_camel.core.proxy$java.lang.Object$Predicate</expressionDefinition>
+                <log id="1" message="when 2"/>
+                <process customId="true" id="1"/>
+            </when>
+            <otherwise id="1">
+                <log id="1" message="otherwise"/>
+                <process customId="true" id="1"/>
+            </otherwise>
+        </choice>
+        <log id="1" message="after choice"/>
+    </route>
+</routes>

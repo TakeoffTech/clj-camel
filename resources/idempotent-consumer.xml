@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route customId="false" id="1">
+        <from uri="direct:test"/>
+        <setBody id="1">
+            <constant>test</constant>
+        </setBody>
+        <idempotentConsumer id="1">
+            <simple>${body}</simple>
+            <log id="1" message="after idempotent-consumer"/>
+            <to id="1" uri="direct:result"/>
+        </idempotentConsumer>
+    </route>
+</routes>
