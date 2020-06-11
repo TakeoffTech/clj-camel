@@ -5,7 +5,7 @@
             [clojure.xml :as xml]
             [clojure.data]
             [clojure.java.io :as io]
-            [clj-camel.test-util :as test-util]))
+            [clj-camel.test-utils :as test-utils]))
 
 (deftest do-try-route-test
   (is (= (-> (c/route-builder (c/from "direct:test")
@@ -19,10 +19,10 @@
                                           (c/log "finally2")))
                               (c/log "after do-try"))
              (cu/dump-route-to-xml)
-             (test-util/str->input-stream)
+             (test-utils/str->input-stream)
              (xml/parse)
-             (test-util/remove-ids)
-             (test-util/remove-expression-definition))
+             (test-utils/remove-ids)
+             (test-utils/remove-expression-definition))
          (-> "do-try.xml"
              (io/resource)
              (io/input-stream)

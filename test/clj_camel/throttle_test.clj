@@ -5,7 +5,7 @@
             [clojure.xml :as xml]
             [clojure.data]
             [clojure.java.io :as io]
-            [clj-camel.test-util :as test-util]))
+            [clj-camel.test-utils :as test-utils]))
 
 (deftest throttle-route-test
   (is (= (-> (c/route-builder (c/from "direct:test")
@@ -16,9 +16,9 @@
                               (c/log "after throttling")
                               (c/to "direct:result"))
              (cu/dump-route-to-xml)
-             (test-util/str->input-stream)
+             (test-utils/str->input-stream)
              (xml/parse)
-             (test-util/remove-ids))
+             (test-utils/remove-ids))
          (-> "throttle.xml"
              (io/resource)
              (io/input-stream)

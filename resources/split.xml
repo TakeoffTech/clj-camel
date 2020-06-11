@@ -8,7 +8,7 @@
             <jsonpath>$.data.*</jsonpath>
             <process customId="true" id="dummy-process-1"/>
             <filter customId="true" id="filter-id">
-                <expressionDefinition>clj_camel.core.proxy$java.lang.Object$Predicate</expressionDefinition>
+                <expressionDefinition>clj_camel.core$predicate</expressionDefinition>
                 <log customId="true" id="log" message="Filtered ... ${body}"/>
                 <to customId="true" id="result" uri="direct:result"/>
             </filter>

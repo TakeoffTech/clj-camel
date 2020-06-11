@@ -1,5 +1,7 @@
 # Clojure DSL for apache camel
 
+![Clojure CI](https://github.com/TakeoffTech/clj-camel/workflows/Clojure%20CI/badge.svg)
+
 The library adds a thin layer on top of Java Apache Camel.
 
 ## Installation

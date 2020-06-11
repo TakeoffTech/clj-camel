@@ -5,7 +5,7 @@
             [clojure.xml :as xml]
             [clojure.data]
             [clojure.java.io :as io]
-            [clj-camel.test-util :as test-util]))
+            [clj-camel.test-utils :as test-utils]))
 
 (defn some-processor [_] {:body "processor body"})
 
@@ -23,10 +23,10 @@
                                           (c/process some-processor)))
                               (c/log "after choice"))
              (cu/dump-route-to-xml)
-             (test-util/str->input-stream)
+             (test-utils/str->input-stream)
              (xml/parse)
-             (test-util/remove-ids)
-             (test-util/remove-expression-definition))
+             (test-utils/remove-ids)
+             (test-utils/remove-expression-definition))
          (-> "choice.xml"
              (io/resource)
              (io/input-stream)

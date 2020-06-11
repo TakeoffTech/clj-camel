@@ -5,7 +5,7 @@
             [clojure.xml :as xml]
             [clojure.data]
             [clojure.java.io :as io]
-            [clj-camel.test-util :as test-util]))
+            [clj-camel.test-utils :as test-utils]))
 
 (defn processor1 [_] {:body "before"})
 
@@ -24,9 +24,9 @@
                                                  (c/to "direct:result" {:id "result"})))
                               (c/process (fn [_] {:body "after"}) {:id "dummy-process-2"}))
              (cu/dump-route-to-xml)
-             (test-util/str->input-stream)
+             (test-utils/str->input-stream)
              (xml/parse)
-             (test-util/remove-expression-definition))
+             (test-utils/remove-expression-definition))
          (-> "split.xml"
              (io/resource)
              (io/input-stream)
