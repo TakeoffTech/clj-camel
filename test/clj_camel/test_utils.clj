@@ -1,6 +1,5 @@
 (ns clj-camel.test-utils
-  (:require [clojure.test :refer :all]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [com.rpl.specter :as specter]
             [clojure.string :as string])
   (:import (java.io ByteArrayInputStream)))

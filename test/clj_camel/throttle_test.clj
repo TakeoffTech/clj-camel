@@ -1,5 +1,5 @@
 (ns clj-camel.throttle-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest is]]
             [clj-camel.core :as c]
             [clj-camel.util :as cu]
             [clojure.xml :as xml]

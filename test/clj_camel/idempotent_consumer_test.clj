@@ -1,5 +1,5 @@
 (ns clj-camel.idempotent-consumer-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest is]]
             [clj-camel.core :as c]
             [clj-camel.util :as cu]
             [clj-camel.test-utils :as test-utils]
