@@ -94,17 +94,3 @@
     (let [xml (.dumpRoutesAsXml (.getManagedCamelContext managed-ctx))]
       (.shutdown ctx)
       xml)))
-
-;; foo has an arity of 2, but we're not actually using y
- (defn foo-fn [x y]
-   ;; this do is redundant:
-   (do
-     ;; this is handy for debugging, but please remove it before pushing your code:
-     (def tmp_x x)
-     (let [y (fn [] (inc x))]
-       ;; the next let can be squashed together with the previous:
-       (let [z y]
-         ;; whoopsy, calling a local function with an incorrect number of args:
-         (y x)
-         ;; also wrong:
-         (recur)))))
