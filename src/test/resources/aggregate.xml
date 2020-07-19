@@ -5,7 +5,7 @@
         <setBody id="1">
             <constant>test</constant>
         </setBody>
-        <aggregate completionSize="1000" completionTimeout="1000" completionTimeoutCheckerInterval="1000" id="1">
+        <aggregate completionSize="1000" completionTimeout="1000" completionTimeoutCheckerInterval="1s" id="1">
             <correlationExpression>
                 <expressionDefinition/>
             </correlationExpression>

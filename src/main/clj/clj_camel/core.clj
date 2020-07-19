@@ -382,8 +382,8 @@
       (let [^Exception e (.getProperty ex Exchange/EXCEPTION_CAUGHT ^Class Exception)
             error-type (detect-error-type e)
             message (.getMessage e)]
-        (-> ex .getIn (.setHeaders {"error-type"  error-type
-                                    "error-cause" message}))))))
+        (-> ex .getIn (.setHeaders {":error-type"  error-type
+                                    ":error-cause" message}))))))
 
 (defn dead-letter [^RouteDefinition r & [^String uri {:keys [add-exception-message-to-header ;TODO think about more elegant handle map parameters
                                                              maximum-redeliveries
@@ -460,8 +460,10 @@
     (applyFilterToExternalHeaders [self header-name header-value exchange]
       (filter-headers to-external-headers header-name))))
 
-(defn marshal [^ProcessorDefinition pd & [^String data-type-ref]]
-  (.marshal pd data-type-ref))
+(defn marshal
+  "Marshal the in body using the specified DataFormat"
+  [^ProcessorDefinition pd & [^DataFormatDefinition data-format-definition]]
+  (.marshal pd data-format-definition))
 
 (defmacro choice
   "The Content Based Router from the EIP patterns allows you to route messages to the correct

@@ -16,6 +16,10 @@
                  [metosin/jsonista "0.2.6"]
                  [clj-time "0.15.2"]]
   :target-path "target/%s"
+
+  :source-paths ["src/main/clj"]
+  :test-paths ["src/test/clj" "src/test/resources"]
+
   :profiles {:test    {:dependencies [[com.rpl/specter "1.1.3"]
                                       [org.ehcache/ehcache "3.8.1"]
                                       [org.apache.camel/camel-http "3.3.0"]
