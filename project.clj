@@ -1,4 +1,4 @@
-(defproject takeoff/clj-camel "2020-07-20.3.4.1"
+(defproject takeoff/clj-camel "latest"
   :description "Clojure wrapper for Apache Camel"
   :url "https://github.com/TakeoffTech/clj-camel"
   :license {:name "Apache License Version 2.0"
