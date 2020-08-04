@@ -99,7 +99,7 @@ Caching ([original doc](https://camel.apache.org/components/latest/jcache-compon
                  (c/log "key value result: ${body}")
                  (c/to "direct:result"))
 ```
-Throttling ([original doc](([original doc](https://camel.apache.org/components/latest/eips/aggregate-eip.html)))
+Throttling ([original doc](https://camel.apache.org/components/latest/eips/throttle-eip.html))
 ```clojure
 (c/route-builder (c/from "direct:test")
                  (c/set-body (c/constant "test"))
@@ -109,7 +109,7 @@ Throttling ([original doc](([original doc](https://camel.apache.org/components/l
                  (c/log "after throttling")
                  (c/to "direct:result"))
 ``` 
-Try/Catch/Finally ([original doc](([original doc](https://camel.apache.org/components/latest/eips/aggregate-eip.html)))
+Try/Catch/Finally ([original doc](https://camel.apache.org/manual/latest/try-catch-finally.html))
 ```clojure
 (c/route-builder (c/from "direct:test")
                  (c/route-id "test-route")
