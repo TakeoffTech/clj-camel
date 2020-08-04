@@ -1,6 +1,6 @@
 # Clojure DSL for apache camel ![Clojure CI](https://github.com/TakeoffTech/clj-camel/workflows/Clojure%20CI/badge.svg)
 
-##Motivation
+## Motivation
 
 Camel is an open source integration framework that empowers you to quickly and easily integrate various systems consuming or producing data.
 
