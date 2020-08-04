@@ -1,4 +1,4 @@
-# Clojure DSL for apache camel ![Clojure CI](https://github.com/TakeoffTech/clj-camel/workflows/Clojure%20CI/badge.svg)
+# Clojure DSL for Apache Camel ![Clojure CI](https://github.com/TakeoffTech/clj-camel/workflows/Clojure%20CI/badge.svg)
 
 ## Motivation
 
