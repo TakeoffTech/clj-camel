@@ -16,12 +16,8 @@ jobs:
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-      - name: Debug
-        run: echo ${{ steps.get_version.outputs.VERSION }}
       - name: Change version in project.clj
         run: sed -i "s/^\((defproject.*\)\".*\"/\1\"${{ steps.get_version.outputs.VERSION }}\"/g" project.clj
-      - name: debug
-        run: cat project.clj
       - name: Deploy to clojar
         env:
           CLOJARS_USER: ${{ secrets.CLOJARS_USERNAME }}

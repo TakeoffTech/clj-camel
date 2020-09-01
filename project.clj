@@ -20,6 +20,11 @@
   :source-paths ["src/main/clj"]
   :test-paths ["src/test/clj" "src/test/resources"]
 
+  :deploy-repositories [["clojars" {:url           "https://clojars.org/repo"
+                                    :username      :env/clojars_user
+                                    :password      :env/clojars_pass
+                                    :sign-releases false}]]
+  
   :profiles {:test    {:dependencies [[com.rpl/specter "1.1.3"]
                                       [org.ehcache/ehcache "3.8.1"]
                                       [org.apache.camel/camel-http "3.3.0"]
