@@ -13,7 +13,7 @@ provides a more idiomatic experience of using Apache Camel in the Clojure ecosys
 Include in your project.clj
 
 ```clojure
-[takeoff/clj-camel "1.0.0"]
+[![Clojars Project](https://img.shields.io/clojars/v/takeoff/clj-camel.svg)](https://clojars.org/takeoff/clj-camel)
 ```
 
 
