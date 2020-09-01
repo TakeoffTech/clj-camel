@@ -1,7 +1,5 @@
 on:
   push:
-    paths:
-      - "feature/**"
     branches:
       - master
     tags:
