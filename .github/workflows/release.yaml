@@ -23,4 +23,7 @@ jobs:
       - name: debug
         run: cat project.clj
       - name: Deploy to clojar
-        run: lein deploy
+        env:
+          CLOJARS_USER: ${{ secrets.CLOJARS_USERNAME }}
+          CLOJARS_PASS: ${{ secrets.CLOJARS_PASSWORD }}
+        run: lein deploy clojars
