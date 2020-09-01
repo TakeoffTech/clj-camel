@@ -13,9 +13,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Create transient pom file
-        run: lein pom
-      - uses: jlesquembre/clojars-publish-action@0.3
-        env:
-          CLOJARS_USERNAME: ${{ secrets.CLOJARS_USERNAME }}
-          CLOJARS_PASSWORD: ${{ secrets.CLOJARS_PASSWORD }}
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Debug
+        run: echo ${{ steps.get_version.outputs.VERSION }}
+      - name: Change version in project.clj
+        run: sed -i "s/^\((defproject.*\)\".*\"/\1\"${{ steps.get_version.outputs.VERSION }}\"/g" project.clj
+      - name: debug
+        run: cat project.clj
+      - name: Deploy to clojar
+        run: lein deploy
