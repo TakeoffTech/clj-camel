@@ -1,0 +1,23 @@
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+
+jobs:
+  clojars:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Change version in project.clj
+        run: sed -i "s/^\((defproject.*\)\".*\"/\1\"${{ steps.get_version.outputs.VERSION }}\"/g" project.clj
+      - name: Deploy to clojar
+        env:
+          CLOJARS_USER: ${{ secrets.CLOJARS_USERNAME }}
+          CLOJARS_PASS: ${{ secrets.CLOJARS_PASSWORD }}
+        run: lein deploy clojars
