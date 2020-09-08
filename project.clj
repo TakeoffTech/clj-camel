@@ -6,10 +6,10 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/tools.logging "1.0.0"]
 
-                 [org.apache.camel/camel-core "3.4.3"]
-                 [org.apache.camel/camel-sql "3.4.3"]
-                 [org.apache.camel/camel-jcache "3.4.3"]
-                 [org.apache.camel/camel-management "3.4.3"]
+                 [org.apache.camel/camel-core "3.5.0"]
+                 [org.apache.camel/camel-sql "3.5.0"]
+                 [org.apache.camel/camel-jcache "3.5.0"]
+                 [org.apache.camel/camel-management "3.5.0"]
                  [malabarba/lazy-map "1.3"]
 
                  [camel-snake-kebab "0.4.1"]
@@ -27,6 +27,6 @@
   
   :profiles {:test    {:dependencies [[com.rpl/specter "1.1.3"]
                                       [org.ehcache/ehcache "3.8.1"]
-                                      [org.apache.camel/camel-http "3.4.3"]
-                                      [org.apache.camel/camel-jsonpath "3.4.3"]]}
+                                      [org.apache.camel/camel-http "3.5.0"]
+                                      [org.apache.camel/camel-jsonpath "3.5.0"]]}
              :uberjar {:aot :all}})
