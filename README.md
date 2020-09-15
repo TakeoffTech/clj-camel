@@ -37,12 +37,12 @@ Simple route
 Filter ([original doc](https://camel.apache.org/components/latest/eips/filter-eip.html))
 ```clojure
 (c/route-builder (c/from "direct:test")
-            (c/route-id "test-route")
-            (c/to "http://test-http")
-            (c/filter (c/predicate (comp pos? :body))
-                      (c/log "Filtered ... ${body}")
-                      (c/to "direct:result"))
-            (c/process (fn [_] {:body "after filter"})))
+                 (c/route-id "test-route")
+                 (c/to "http://test-http")
+                 (c/filter (c/predicate (comp pos? :body))
+                           (c/log "Filtered ... ${body}")
+                           (c/to "direct:result"))
+                 (c/process (fn [_] {:body "after filter"})))
 ```
 
 Choice ([original doc](https://camel.apache.org/components/latest/eips/choice-eip.html))
