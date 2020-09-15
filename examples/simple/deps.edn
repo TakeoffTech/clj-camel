@@ -1,0 +1,18 @@
+{:paths ["src" "resources"]
+ :deps  {org.clojure/clojure            {:mvn/version "1.10.1"}
+
+         ch.qos.logback/logback-classic {:mvn/version "1.2.3"}
+         ch.qos.logback/logback-core    {:mvn/version "1.2.3"}
+         org.slf4j/slf4j-api            {:mvn/version "1.7.30"}
+
+         takeoff/clj-camel              {:mvn/version "1.1.0"}}
+ :aliases
+        {:test    {:extra-paths ["test"]
+                   :extra-deps  {org.clojure/test.check {:mvn/version "1.0.0"}}}
+         :runner  {:extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner"
+                                                           :sha     "f7ef16dc3b8332b0d77bc0274578ad5270fbfedd"}}
+                   :main-opts  ["-m" "cognitect.test-runner"
+                                "-d" "test"]}
+         :uberjar {:extra-deps {seancorfield/depstar {:mvn/version "1.0.94"}}
+                   :main-opts  ["-m" "hf.depstar.uberjar" "simple.jar"
+                                "-C" "-m" "example.simple"]}}}
