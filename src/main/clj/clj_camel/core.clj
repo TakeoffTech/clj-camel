@@ -53,12 +53,15 @@
   [^RouteDefinition rd & [^Class clazz]]
   (.convertBodyTo rd clazz))
 
+(defn stringify-key [k]
+  (or (get dict k) (str k)))
+
 (defn keyword->string
   "Converting clojure keyword to string
   * using dictionary
   * as keyword string ':some-key' if not present in headers.clj"
   [m]
-  (w/walk (fn [[k v]] [(or (get dict k) (str k)) v]) identity m))
+  (w/walk (fn [[k v]] [(stringify-key k) v]) identity m))
 
 (defn fn-name
   "Getting function name for processor id"
@@ -116,16 +119,22 @@
       (f old new))))
 
 (defn enrich
-  "Enrich an exchange with additional data obtained from
+  "Enrich an exchange with additional data obtained from a resourceUri
   Read more http://camel.apache.org/content-enricher.html"
   [^ProcessorDefinition pd & [^String uri f]]
   (let [^AggregationStrategy as (aggregator f)]
     (.enrich pd uri as)))
 
+(defn poll-enrich
+  "Enrich an exchange with additional data obtained  from a resourceUri using a org.apache.camel.PollingConsumer to poll the endpoint.
+  Read more http://camel.apache.org/content-enricher.html"
+  [^ProcessorDefinition pd & [^String uri]]
+  (.pollEnrich pd uri))
+
 (defn set-header
   "Adds a processor which sets the header on the IN message"
   [^ProcessorDefinition pd & [name ^Expression expr]]
-  (.setHeader pd (str name) expr))
+  (.setHeader pd ^String (stringify-key name) expr))
 
 (defn set-body
   "Adds a processor which sets the body on the IN message"
@@ -202,7 +211,7 @@
   eg.  (c/process (c/copy-body-to-header :body-data))"
   [k]
   (fn [{:keys [headers body]}]
-    {:headers (assoc headers (str k) body)}))
+    {:headers (assoc headers (stringify-key k) body)}))
 
 (defn send-body-and-headers
   "Sends the body to an endpoint with the specified headers and header values"
@@ -213,6 +222,11 @@
   "Sends an asynchronous body to the given endpoint"
   [^ProducerTemplate producer-template ^String endpoint-uri ^Object body ^Map headers]
   (.asyncRequestBodyAndHeaders producer-template endpoint-uri body headers))
+
+(defn request-body-and-headers
+  "Sends an synchronous body to the given endpoint"
+  [^ProducerTemplate producer-template ^String endpoint-uri ^Object body ^Map headers]
+  (.requestBodyAndHeaders producer-template endpoint-uri body headers))
 
 (defmacro split
   "The Splitter from the EIP patterns allows you split a message into a number of pieces and process them individually.
