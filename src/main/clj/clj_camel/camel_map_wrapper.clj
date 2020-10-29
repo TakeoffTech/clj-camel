@@ -36,7 +36,8 @@
          (.equals m (.m ^CamelMapWrapper o))))
 
   Seqable
-  (seq [_] (.seq m)))                                       ; todo check seq
+  (seq [_]
+    (->> m .entrySet (map (fn [entry] [(.getKey entry) (.getValue entry)])))))
 
 (defn camel-map [m]
   (CamelMapWrapper. m))
