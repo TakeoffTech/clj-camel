@@ -1,4 +1,7 @@
 (ns clj-camel.core
+  (:refer-clojure :rename {memoize core-memoize
+                           filter  core-filter
+                           when    core-when})
   (:require [clojure.tools.logging :as log]
             [clojure.string :as string]
             [clojure.walk :as w]
@@ -6,7 +9,7 @@
             [clj-camel.headers :refer [dict]]
             [clj-camel.camel-map-wrapper :refer [camel-map]])
   (:import (org.apache.camel.model RouteDefinition ProcessorDefinition ChoiceDefinition SplitDefinition)
-           (org.apache.camel Exchange Processor Predicate Expression CamelContext NamedNode AggregationStrategy TypeConverter ProducerTemplate)
+           (org.apache.camel Exchange Processor Predicate Expression CamelContext NamedNode AggregationStrategy TypeConverter ProducerTemplate LoggingLevel)
            (org.apache.camel.impl DefaultCamelContext)
            (org.apache.camel.builder DeadLetterChannelBuilder RouteBuilder SimpleBuilder Builder ValueBuilder AggregationStrategies)
            (clojure.lang ExceptionInfo)
@@ -80,9 +83,9 @@
                                                  :properties (camel-map
                                                                (-> ex .getProperties))
                                                  :body       (-> ex .getIn .getBody)}))]
-        (when headers
+        (core-when headers
           (-> ex .getIn (.setHeaders (.m headers))))
-        (when body
+        (core-when body
           (-> ex .getIn (.setBody body)))))))
 
 (defn process
@@ -206,6 +209,20 @@
     (.id (.log pd msg) id)
     (.log pd msg)))
 
+(defn log-warn
+  "Creates a log message to be logged at WARN level."
+  [^ProcessorDefinition pd & [^String msg {:keys [id]}]]
+  (if id
+    (.id (.log pd LoggingLevel/WARN msg) id)
+    (.log pd LoggingLevel/WARN msg)))
+
+(defn log-error
+  "Creates a log message to be logged at ERROR level."
+  [^ProcessorDefinition pd & [^String msg {:keys [id]}]]
+  (if id
+    (.id (.log pd LoggingLevel/ERROR msg) id)
+    (.log pd LoggingLevel/ERROR msg)))
+
 (defn copy-body-to-header
   "Copies current body to header with specific key
   eg.  (c/process (c/copy-body-to-header :body-data))"
@@ -246,10 +263,10 @@
           `(.split ~pd ~expr))
        ~@(when-let [id# (:id opts)]
            `((.id ~id#)))
-       ~@(when (:streaming opts)
-           `((.streaming)))
-       ~@(when (:parallel-processing opts)
-           `((.parallelProcessing)))
+       ~@(core-when (:streaming opts)
+               `((.streaming)))
+       ~@(core-when (:parallel-processing opts)
+               `((.parallelProcessing)))
        ~@(concat body `((.end)))))
 
 (defmacro filter
@@ -307,12 +324,12 @@
                                                             correlation-expression
                                                             caller-runs-when-rejected]}]]
   `(-> (.throttle ~pd ~requests-number)
-       ~@(when (some? async-delayed) `((.asyncDelayed ~async-delayed)))
-       ~@(when (some? reject-execution) `((.rejectExecution ~reject-execution)))
-       ~@(when (some? time-period-millis) `((.timePeriodMillis ~time-period-millis)))
-       ~@(when (some? executor-service-ref) `((.executorServiceRef ~executor-service-ref)))
-       ~@(when (some? correlation-expression) `((.correlationExpression ~correlation-expression)))
-       ~@(when (some? caller-runs-when-rejected) `((.callerRunsWhenRejected ~caller-runs-when-rejected)))))
+       ~@(core-when (some? async-delayed) `((.asyncDelayed ~async-delayed)))
+       ~@(core-when (some? reject-execution) `((.rejectExecution ~reject-execution)))
+       ~@(core-when (some? time-period-millis) `((.timePeriodMillis ~time-period-millis)))
+       ~@(core-when (some? executor-service-ref) `((.executorServiceRef ~executor-service-ref)))
+       ~@(core-when (some? correlation-expression) `((.correlationExpression ~correlation-expression)))
+       ~@(core-when (some? caller-runs-when-rejected) `((.callerRunsWhenRejected ~caller-runs-when-rejected)))))
 
 (defmacro aggregate
   "The Aggregator from the EIP patterns allows you to combine a number of messages together into a single message.
@@ -331,10 +348,10 @@
                                                                                            parallel-processing
                                                                                            completion-predicate]}]]
   `(-> (.aggregate ~pd ~expression ~strategy)
-       ~@(when (some? completion-size) `((.completionSize ~completion-size)))
-       ~@(when (some? completion-timeout) `((.completionTimeout ~completion-timeout)))
-       ~@(when (some? parallel-processing) `((.parallelProcessing ~parallel-processing)))
-       ~@(when (some? completion-predicate) `((.completionPredicate ~completion-predicate)))))
+       ~@(core-when (some? completion-size) `((.completionSize ~completion-size)))
+       ~@(core-when (some? completion-timeout) `((.completionTimeout ~completion-timeout)))
+       ~@(core-when (some? parallel-processing) `((.parallelProcessing ~parallel-processing)))
+       ~@(core-when (some? completion-predicate) `((.completionPredicate ~completion-predicate)))))
 
 (defn create-jdbc-idempotent-repository
   "Creates a new jdbc based repository"

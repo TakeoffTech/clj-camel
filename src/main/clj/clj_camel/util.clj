@@ -1,6 +1,6 @@
 (ns clj-camel.util
-  (:require [clj-camel.data.json :as json]
-            [clj-camel.core :refer :all]
+  (:require [clj-camel.core :as c]
+            [clj-camel.data.json :as json]
             [camel-snake-kebab.core :refer [->kebab-case ->kebab-case-keyword]]
             [camel-snake-kebab.extras :refer [transform-keys]]
             [clojure.java.io :as io])
@@ -42,20 +42,20 @@
 
 (defn transform-json-to-clojure-map-with-kebabified-keys [named-node]
   (-> named-node
-      (process parse-json)
-      (process kebabify-keys)))
+      (c/process parse-json)
+      (c/process kebabify-keys)))
 
 (def map-to-input-stream-converter
-  (type-converter
+  (c/type-converter
     (-> value
         (pr-str)
         (.getBytes)
         (io/input-stream))))
 
 (def exchange->map
-  (type-converter
+  (c/type-converter
     (-> value
-        (get-in-body))))
+        (c/get-in-body))))
 
 (defn set-start-time [{:keys [headers]}]
   {:headers (assoc headers :start-time (. System (nanoTime)))})
@@ -68,28 +68,28 @@
 
 (defn debug-route [{:keys [ctx headers body]} route]
   (let [res (atom nil)
-        ^DefaultCamelContext ctx (or ctx (camel-context))
+        ^DefaultCamelContext ctx (or ctx (c/camel-context))
         ^ManagedCamelContext managed-ctx (.getExtension ctx ManagedCamelContext)
         pd (.createProducerTemplate ctx)]
-    (add-routes ctx
+    (c/add-routes ctx
                 route
-                (route-builder (from "direct:result")
-                               (route-id "debug-result-route")
-                               (process (fn [msg] (reset! res msg)))
-                               (to "mock:mock")))
+                (c/route-builder (c/from "direct:result")
+                               (c/route-id "debug-result-route")
+                               (c/process (fn [msg] (reset! res msg)))
+                               (c/to "mock:mock")))
     (.start ctx)
     (spit "routes.xml" (.dumpRoutesAsXml (.getManagedCamelContext managed-ctx)))
-    (send-body-and-headers pd "direct:test" body headers)
-    (remove-route ctx "test-route")
-    (remove-route ctx "debug-result-route")
+    (c/send-body-and-headers pd "direct:test" body headers)
+    (c/remove-route ctx "test-route")
+    (c/remove-route ctx "debug-result-route")
     (.shutdown ctx)
     (Thread/sleep 100)
     @res))
 
 (defn dump-route-to-xml [route]
-  (let [^DefaultCamelContext ctx (camel-context)
+  (let [^DefaultCamelContext ctx (c/camel-context)
         ^ManagedCamelContext managed-ctx (.getExtension ctx ManagedCamelContext)]
-    (add-routes ctx route)
+    (c/add-routes ctx route)
     (.start ctx)
     (let [xml (.dumpRoutesAsXml (.getManagedCamelContext managed-ctx))]
       (.shutdown ctx)
