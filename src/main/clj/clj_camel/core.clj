@@ -26,6 +26,7 @@
 (def grouped-body-strategy (AggregationStrategies/groupedBody))
 
 (def body-expression (Builder/body))
+(defn header-expression [name] (Builder/header name))
 
 (defmacro route-builder
   "Initialization single route"
@@ -264,9 +265,9 @@
        ~@(when-let [id# (:id opts)]
            `((.id ~id#)))
        ~@(core-when (:streaming opts)
-               `((.streaming)))
+           `((.streaming)))
        ~@(core-when (:parallel-processing opts)
-               `((.parallelProcessing)))
+           `((.parallelProcessing)))
        ~@(concat body `((.end)))))
 
 (defmacro filter
@@ -539,3 +540,21 @@
   [^ProcessorDefinition pd & body]
   `(-> (.onCompletion ~pd)
        ~@(concat body `((.end)))))
+
+(defmacro recipient-list
+  "Creates a dynamic recipient list allowing you to route messages to a number of dynamically specified recipients
+  Params:
+    expr – expression to decide the destinations
+  Options:
+    parallel-processing - if true exchanges processed in parallel
+    agg-strategy - aggregation strategy to use
+    delimiter – a custom delimiter to use
+  Read more https://camel.apache.org/components/latest/eips/recipientList-eip.html"
+  [^ProcessorDefinition pd ^Expression expr opts]
+  `(->
+     ~(if (:delimiter opts)
+        `(.recipientList ~pd ~expr ~(:delimiter opts))
+        `(.recipientList ~pd ~expr))
+     ~@(core-when (some? (:agg-strategy opts)) `((.aggregationStrategy ~(:agg-strategy opts))))
+     ~@(core-when (:parallel-processing opts)
+         `((.parallelProcessing)))))
