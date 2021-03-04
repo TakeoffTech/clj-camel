@@ -550,11 +550,11 @@
     agg-strategy - aggregation strategy to use
     delimiter – a custom delimiter to use
   Read more https://camel.apache.org/components/latest/eips/recipientList-eip.html"
-  [^ProcessorDefinition pd ^Expression expr opts]
+  [^ProcessorDefinition pd ^Expression expr {:keys [delimiter agg-strategy parallel-processing]}]
   `(->
-     ~(if (:delimiter opts)
-        `(.recipientList ~pd ~expr ~(:delimiter opts))
+     ~(if delimiter
+        `(.recipientList ~pd ~expr ~delimiter)
         `(.recipientList ~pd ~expr))
-     ~@(core-when (some? (:agg-strategy opts)) `((.aggregationStrategy ~(:agg-strategy opts))))
-     ~@(core-when (:parallel-processing opts)
+     ~@(core-when (some? agg-strategy) `((.aggregationStrategy ~agg-strategy)))
+     ~@(core-when parallel-processing
          `((.parallelProcessing)))))
