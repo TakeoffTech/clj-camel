@@ -1,6 +1,6 @@
 (ns clj-camel.camel-map-wrapper
   (:require [clj-camel.headers :refer [dict]])
-  (:import (clojure.lang Associative ILookup MapEntry IPersistentCollection Seqable)
+  (:import (clojure.lang Associative ILookup MapEntry IPersistentCollection Seqable IFn)
            (java.util Map)))
 
 (defn create-key [k]
@@ -13,6 +13,9 @@
 
   (valAt [this k]
     (.valAt this k nil))
+
+  IFn
+  (invoke [_ k] (get m (create-key k)))
 
   Associative
   (assoc [_ k v]
