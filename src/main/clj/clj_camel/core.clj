@@ -9,14 +9,14 @@
             [clj-camel.headers :refer [dict]]
             [clj-camel.camel-map-wrapper :refer [camel-map]])
   (:import (org.apache.camel.model RouteDefinition ProcessorDefinition ChoiceDefinition SplitDefinition)
-           (org.apache.camel Exchange Processor Predicate Expression CamelContext NamedNode AggregationStrategy TypeConverter ProducerTemplate LoggingLevel)
+           (org.apache.camel Exchange Processor Predicate Expression CamelContext NamedNode AggregationStrategy TypeConverter ProducerTemplate LoggingLevel ConsumerTemplate)
            (org.apache.camel.impl DefaultCamelContext)
            (org.apache.camel.builder DeadLetterChannelBuilder RouteBuilder SimpleBuilder Builder ValueBuilder AggregationStrategies)
            (clojure.lang ExceptionInfo)
            (org.apache.camel.model.language JsonPathExpression)
            (org.apache.camel.spi HeaderFilterStrategy IdempotentRepository)
            (java.util Map)
-           (org.apache.camel.model ThrottleDefinition SplitDefinition AggregateDefinition ExpressionNode TryDefinition DataFormatDefinition)
+           (org.apache.camel.model ThrottleDefinition SplitDefinition AggregateDefinition ExpressionNode TryDefinition DataFormatDefinition OnCompletionDefinition)
            (org.apache.camel.component.jcache.policy JCachePolicy)
            (javax.sql DataSource)
            (org.apache.camel.processor.idempotent.jdbc JdbcMessageIdRepository)
@@ -376,10 +376,10 @@
 (defmacro idempotent-consumer
   "The Idempotent Consumer from the EIP patterns is used to filter out duplicate messages.
   Read more https://camel.apache.org/components/latest/eips/idempotentConsumer-eip.html"
-  [^ProcessorDefinition pd ^Expression opts & body]
-  (let [{:keys [msg-id repo]} opts]
-    `(-> pd
-         (.idempotentConsumer msg-id repo)
+  [^ProcessorDefinition pd ^Expression msg-id opts & body]
+  (let [{:keys [repo]} opts]
+    `(-> ~pd
+         (.idempotentConsumer ~msg-id ~repo)
          ~@(concat body `((.end))))))
 
 (defmacro do-try
@@ -609,7 +609,11 @@
   [^ProcessorDefinition pd]
   (.stop pd))
 
-(defmacro multicast [^ProcessorDefinition pd opts & body]
+(defmacro multicast
+  "Multicast EIP:  Multicasts messages to all its child outputs;
+  so that each processor and destination gets a copy of the original message to avoid the processors
+  interfering with each other."
+  [^ProcessorDefinition pd opts & body]
   `(-> (.multicast pd)
        ~@(core-when (:parallel-processing opts)
            `((.parallelProcessing)))

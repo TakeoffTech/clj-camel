@@ -11,9 +11,9 @@
   (is (= (-> (c/route-builder (c/from "direct:test")
                               (c/set-body (c/constant "test"))
                               (c/idempotent-consumer (c/simple "${body}")
-                                                     (c/create-memory-idempotent-repository))
-                              (c/log "after idempotent-consumer")
-                              (c/to "direct:result"))
+                                {:repo (c/create-memory-idempotent-repository)}
+                                (c/log "after idempotent-consumer")
+                                (c/to "direct:result")))
              (cu/dump-route-to-xml)
              (test-utils/str->input-stream)
              (xml/parse)
