@@ -10,7 +10,8 @@
            (javax.cache.configuration MutableConfiguration)
            (javax.cache.expiry CreatedExpiryPolicy Duration)
            (javax.cache Caching)
-           (java.util.concurrent TimeUnit)))
+           (java.util.concurrent TimeUnit)
+           (org.apache.camel.component.file.remote SftpEndpoint RemoteFileOperations)))
 
 (defn create-jcache-expiration-policy [cache-name ^long seconds]
   (let [conf (-> (MutableConfiguration.)
@@ -72,11 +73,11 @@
         ^ManagedCamelContext managed-ctx (.getExtension ctx ManagedCamelContext)
         pd (.createProducerTemplate ctx)]
     (c/add-routes ctx
-                route
-                (c/route-builder (c/from "direct:result")
-                               (c/route-id "debug-result-route")
-                               (c/process (fn [msg] (reset! res msg)))
-                               (c/to "mock:mock")))
+                  route
+                  (c/route-builder (c/from "direct:result")
+                                   (c/route-id "debug-result-route")
+                                   (c/process (fn [msg] (reset! res msg)))
+                                   (c/to "mock:mock")))
     (.start ctx)
     (spit "routes.xml" (.dumpRoutesAsXml (.getManagedCamelContext managed-ctx)))
     (c/send-body-and-headers pd "direct:test" body headers)
@@ -94,3 +95,28 @@
     (let [xml (.dumpRoutesAsXml (.getManagedCamelContext managed-ctx))]
       (.shutdown ctx)
       xml)))
+
+(defn full-path
+  "Get full path of GenericFileConfiguration"
+  [^SftpEndpoint endpoint file-name]
+  (-> endpoint
+      (.getConfiguration)
+      (.getDirectory)
+      (str "/" file-name)))
+
+(defn retrieve-file
+  "Retrieves the file"
+  [^RemoteFileOperations ops path exchange]
+  (.retrieveFile ops path exchange -1))
+
+(defmacro with-file-operations
+  "Creates scope with connection to Remote File Storage (e.g FTP)
+   Out of scope connection is automatically closed
+   Exposes variable ops in macro body"
+  [^SftpEndpoint endpoint & body]
+  `(let [~'ops (.createRemoteFileOperations ~endpoint)]
+     (try
+       (.connect ~'ops (.getConfiguration ~endpoint))
+       ~@body
+       (finally
+         (.disconnect ~'ops)))))

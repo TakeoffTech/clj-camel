@@ -10,6 +10,7 @@
                  [org.apache.camel/camel-sql "3.7.0"]
                  [org.apache.camel/camel-jcache "3.7.0"]
                  [org.apache.camel/camel-management "3.7.0"]
+                 [org.apache.camel/camel-ftp "3.7.0"]
                  [malabarba/lazy-map "1.3"]
 
                  [camel-snake-kebab "0.4.1"]
@@ -24,7 +25,7 @@
                                     :username      :env/clojars_user
                                     :password      :env/clojars_pass
                                     :sign-releases false}]]
-  
+
   :profiles {:test    {:dependencies [[com.rpl/specter "1.1.3"]
                                       [org.ehcache/ehcache "3.8.1"]
                                       [org.apache.camel/camel-http "3.7.0"]
