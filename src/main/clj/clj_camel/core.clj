@@ -598,7 +598,7 @@
   [^ProcessorDefinition pd]
   (.end pd))
 
-(defn onWhen
+(defn on-when
   "Sets an additional predicate that should be true before the onCompletion is triggered.
   To be used for fine grained controlling whether a completion callback should be invoked or not"
   [^OnCompletionDefinition pd ^Predicate p]
