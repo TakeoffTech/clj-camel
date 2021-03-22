@@ -11,7 +11,8 @@
            (javax.cache.expiry CreatedExpiryPolicy Duration)
            (javax.cache Caching)
            (java.util.concurrent TimeUnit)
-           (org.apache.camel.component.file.remote SftpEndpoint RemoteFileOperations)))
+           (org.apache.camel.component.file.remote SftpEndpoint RemoteFileOperations)
+           (utils MDCFromHeadersUnitOfWorkFactory PubSubAttributePropagationIntoHeadersPolicyFactory)))
 
 (defn create-jcache-expiration-policy [cache-name ^long seconds]
   (let [conf (-> (MutableConfiguration.)
@@ -120,3 +121,11 @@
        ~@body
        (finally
          (.disconnect ~'ops)))))
+
+(defn set-customer-uow-with-mdc-from-headers [^DefaultCamelContext context mapping]
+  {:pre [(map? mapping)]}
+  (.setUnitOfWorkFactory context (MDCFromHeadersUnitOfWorkFactory. mapping)))
+
+(defn set-pubsub-attributes-propagation [^DefaultCamelContext context mapping]
+  {:pre [(map? mapping)]}
+  (.addRoutePolicyFactory context (PubSubAttributePropagationIntoHeadersPolicyFactory. mapping)))

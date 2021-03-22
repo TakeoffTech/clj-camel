@@ -1,20 +1,18 @@
 # Clojure DSL for Apache Camel ![Clojure CI](https://github.com/TakeoffTech/clj-camel/workflows/Clojure%20CI/badge.svg) [![Clojars Project](https://img.shields.io/clojars/v/takeoff/clj-camel.svg)](https://clojars.org/takeoff/clj-camel)
 
-
 ## Motivation
 
-Camel is an open source integration framework that empowers you to quickly and easily integrate various systems consuming or producing data.
+Camel is an open source integration framework that empowers you to quickly and easily integrate various systems
+consuming or producing data.
 
-This library adds a thin layer on top of Java [Apache Camel](https://camel.apache.org) and 
-provides a more idiomatic experience of using Apache Camel in the Clojure ecosystem, without changing the original functionality.
-
+This library adds a thin layer on top of Java [Apache Camel](https://camel.apache.org) and provides a more idiomatic
+experience of using Apache Camel in the Clojure ecosystem, without changing the original functionality.
 
 ## Installation
 
 Include in your project.clj
 
 ![](https://clojars.org/takeoff/clj-camel/latest-version.svg)
-
 
 ## Usage
 
@@ -26,6 +24,7 @@ Include in your project.clj
 ## Examples
 
 Simple route
+
 ```clojure
 (c/route-builder (c/from "direct:test")
                  (c/route-id "test-route")
@@ -35,6 +34,7 @@ Simple route
 ```
 
 Filter ([original doc](https://camel.apache.org/components/latest/eips/filter-eip.html))
+
 ```clojure
 (c/route-builder (c/from "direct:test")
                  (c/route-id "test-route")
@@ -46,6 +46,7 @@ Filter ([original doc](https://camel.apache.org/components/latest/eips/filter-ei
 ```
 
 Choice ([original doc](https://camel.apache.org/components/latest/eips/choice-eip.html))
+
 ```clojure
 (c/route-builder (c/choice (c/when (c/predicate (comp pos? :body))
                                    (c/log "when 1")
@@ -54,12 +55,13 @@ Choice ([original doc](https://camel.apache.org/components/latest/eips/choice-ei
                                    (c/log "when 2")
                                    (c/process some-processor))
                            (c/otherwise
-                                   (c/log "otherwise")
-                                   (c/process some-processor)))
+                             (c/log "otherwise")
+                             (c/process some-processor)))
                  (c/log "after choice"))
 ```
 
 Split ([original doc](https://camel.apache.org/components/latest/eips/split-eip.html))
+
 ```clojure
 (c/route-builder (c/from "direct:test")
                  (c/route-id "test-route")
@@ -76,6 +78,7 @@ Split ([original doc](https://camel.apache.org/components/latest/eips/split-eip.
 ```
 
 Aggregate ([original doc](https://camel.apache.org/components/latest/eips/aggregate-eip.html))
+
 ```clojure
 (c/route-builder (c/from "direct:test")
                  (c/set-body (c/constant "test"))
@@ -86,7 +89,9 @@ Aggregate ([original doc](https://camel.apache.org/components/latest/eips/aggreg
                  (c/log "after aggregating")
                  (c/to "direct:result"))
 ```
+
 Caching ([original doc](https://camel.apache.org/components/latest/jcache-component.html))
+
 ```clojure
 (c/route-builder (c/from "direct:test")
                  (c/route-id "test-route")
@@ -98,7 +103,9 @@ Caching ([original doc](https://camel.apache.org/components/latest/jcache-compon
                  (c/log "key value result: ${body}")
                  (c/to "direct:result"))
 ```
+
 Throttling ([original doc](https://camel.apache.org/components/latest/eips/throttle-eip.html))
+
 ```clojure
 (c/route-builder (c/from "direct:test")
                  (c/set-body (c/constant "test"))
@@ -108,7 +115,9 @@ Throttling ([original doc](https://camel.apache.org/components/latest/eips/throt
                  (c/log "after throttling")
                  (c/to "direct:result"))
 ``` 
+
 Try/Catch/Finally ([original doc](https://camel.apache.org/manual/latest/try-catch-finally.html))
+
 ```clojure
 (c/route-builder (c/from "direct:test")
                  (c/route-id "test-route")
@@ -120,4 +129,35 @@ Try/Catch/Finally ([original doc](https://camel.apache.org/manual/latest/try-cat
                              (c/log "finally")
                              (c/log "finally2")))
                  (c/log "after do-try"))
+```
+
+MDC from headers UOW
+
+The following will populate MDC context with `name-of-mdc-field` with value of incoming exchange header
+field `name-of-header-field`
+(if incoming exchange has a respective header)
+
+Example of log:
+
+```json
+{
+  "message": "example message",
+  "mdc": {
+    "name-of-mdc-field": "test-value",
+    "camel.breadcrumbId": "xxx",
+    "camel.routeId": "yyy"
+  }
+}
+```
+
+```clojure
+(c/set-customer-uow-with-mdc-from-headers context {"name-of-header-filed" "name-of-mdc-field"})
+```
+
+GCP Pub-sub attributes propagation
+
+Specified pub-sub message attributes will be added to exchange header if exist
+
+```clojure
+(c/set-pubsub-attributes-propagation context {"pubsub-attribute-name" "name-of-header-field"})
 ```
