@@ -145,12 +145,6 @@
   [^ProcessorDefinition processor-definition & [^Expression expr]]
   (.setBody processor-definition expr))
 
-(defn set-in-body [^Exchange ex body]
-  (-> ex .getIn (.setBody body)))
-
-(defn set-in-header [^Exchange ex k value]
-  (-> ex .getIn (.setHeader (str k) value)))
-
 (defn simple
   "Creates simple expression
   eg. (c/idempotent-consumer (c/simple '${body}') (c/create-memory-idempotent-repository))"
@@ -464,6 +458,12 @@
 
 (defn get-in-header [^Exchange ex k]
   (-> ex (.getIn) (.getHeader (name k))))
+
+(defn set-in-body [^Exchange ex body]
+  (-> ex .getIn (.setBody body)))
+
+(defn set-in-header [^Exchange ex k value]
+  (-> ex .getIn (.setHeader (name k) value)))
 
 (defn debug-exchange-log [ex]
   (log/warn "------------------------------------------")
