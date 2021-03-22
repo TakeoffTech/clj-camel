@@ -9,14 +9,14 @@
             [clj-camel.headers :refer [dict]]
             [clj-camel.camel-map-wrapper :refer [camel-map]])
   (:import (org.apache.camel.model RouteDefinition ProcessorDefinition ChoiceDefinition SplitDefinition)
-           (org.apache.camel Exchange Processor Predicate Expression CamelContext NamedNode AggregationStrategy TypeConverter ProducerTemplate LoggingLevel)
+           (org.apache.camel Exchange Processor Predicate Expression CamelContext NamedNode AggregationStrategy TypeConverter ProducerTemplate LoggingLevel ConsumerTemplate)
            (org.apache.camel.impl DefaultCamelContext)
            (org.apache.camel.builder DeadLetterChannelBuilder RouteBuilder SimpleBuilder Builder ValueBuilder AggregationStrategies)
            (clojure.lang ExceptionInfo)
            (org.apache.camel.model.language JsonPathExpression)
            (org.apache.camel.spi HeaderFilterStrategy IdempotentRepository)
            (java.util Map)
-           (org.apache.camel.model ThrottleDefinition SplitDefinition AggregateDefinition ExpressionNode TryDefinition DataFormatDefinition)
+           (org.apache.camel.model ThrottleDefinition SplitDefinition AggregateDefinition ExpressionNode TryDefinition DataFormatDefinition OnCompletionDefinition)
            (org.apache.camel.component.jcache.policy JCachePolicy)
            (javax.sql DataSource)
            (org.apache.camel.processor.idempotent.jdbc JdbcMessageIdRepository)
@@ -144,6 +144,12 @@
   "Adds a processor which sets the body on the IN message"
   [^ProcessorDefinition processor-definition & [^Expression expr]]
   (.setBody processor-definition expr))
+
+(defn set-in-body [^Exchange ex body]
+  (-> ex .getIn (.setBody body)))
+
+(defn set-in-header [^Exchange ex k value]
+  (-> ex .getIn (.setHeader (str k) value)))
 
 (defn simple
   "Creates simple expression
@@ -344,15 +350,17 @@
   (c/to 'direct:result')
   ...
   "
-  [^ProcessorDefinition pd ^Expression expression ^AggregationStrategy strategy & [{:keys [completion-size
-                                                                                           completion-timeout
-                                                                                           parallel-processing
-                                                                                           completion-predicate]}]]
-  `(-> (.aggregate ~pd ~expression ~strategy)
-       ~@(core-when (some? completion-size) `((.completionSize ~completion-size)))
-       ~@(core-when (some? completion-timeout) `((.completionTimeout ~completion-timeout)))
-       ~@(core-when (some? parallel-processing) `((.parallelProcessing ~parallel-processing)))
-       ~@(core-when (some? completion-predicate) `((.completionPredicate ~completion-predicate)))))
+  [^ProcessorDefinition pd ^Expression expression ^AggregationStrategy strategy opts & body]
+  (let [{:keys [completion-size
+                completion-timeout
+                parallel-processing
+                completion-predicate]} opts]
+    `(-> (.aggregate ~pd ~expression ~strategy)
+         ~@(core-when (some? completion-size) `((.completionSize ~completion-size)))
+         ~@(core-when (some? completion-timeout) `((.completionTimeout ~completion-timeout)))
+         ~@(core-when (some? parallel-processing) `((.parallelProcessing ~parallel-processing)))
+         ~@(core-when (some? completion-predicate) `((.completionPredicate ~completion-predicate)))
+         ~@(concat body `((.end))))))
 
 (defn create-jdbc-idempotent-repository
   "Creates a new jdbc based repository"
@@ -365,11 +373,14 @@
   []
   (MemoryIdempotentRepository/memoryIdempotentRepository))
 
-(defn idempotent-consumer
+(defmacro idempotent-consumer
   "The Idempotent Consumer from the EIP patterns is used to filter out duplicate messages.
   Read more https://camel.apache.org/components/latest/eips/idempotentConsumer-eip.html"
-  [^ProcessorDefinition pd ^Expression msg-id & [^IdempotentRepository repo]]
-  (.idempotentConsumer pd msg-id repo))
+  [^ProcessorDefinition pd ^Expression msg-id opts & body]
+  (let [{:keys [repo]} opts]
+    `(-> ~pd
+         (.idempotentConsumer ~msg-id ~repo)
+         ~@(concat body `((.end))))))
 
 (defmacro do-try
   "Try... Catch...Finally block
@@ -420,12 +431,14 @@
 (defn dead-letter [^RouteDefinition r & [^String uri {:keys [add-exception-message-to-header ;TODO think about more elegant handle map parameters
                                                              maximum-redeliveries
                                                              redelivery-delay
-                                                             back-off-multiplier]}]]
+                                                             back-off-multiplier
+                                                             use-exponential-backoff]}]]
   (let [dl-builder (cond-> (DeadLetterChannelBuilder. uri)
                            add-exception-message-to-header (.onPrepareFailure on-prepare-failure-processor)
                            maximum-redeliveries (.maximumRedeliveries maximum-redeliveries)
                            redelivery-delay (.redeliveryDelay redelivery-delay)
-                           back-off-multiplier (.backOffMultiplier back-off-multiplier))]
+                           back-off-multiplier (.backOffMultiplier back-off-multiplier)
+                           use-exponential-backoff (.useExponentialBackOff))]
     (.errorHandler r dl-builder)))
 
 (defn get-endpoint-uri
@@ -550,11 +563,58 @@
     agg-strategy - aggregation strategy to use
     delimiter – a custom delimiter to use
   Read more https://camel.apache.org/components/latest/eips/recipientList-eip.html"
-  [^ProcessorDefinition pd ^Expression expr {:keys [delimiter agg-strategy parallel-processing]}]
-  `(->
-     ~(if delimiter
-        `(.recipientList ~pd ~expr ~delimiter)
-        `(.recipientList ~pd ~expr))
-     ~@(core-when (some? agg-strategy) `((.aggregationStrategy ~agg-strategy)))
-     ~@(core-when parallel-processing
-         `((.parallelProcessing)))))
+  [^ProcessorDefinition pd ^Expression expr opts & body]
+  (let [{:keys [delimiter agg-strategy parallel-processing]} opts]
+    `(->
+       ~(if delimiter
+          `(.recipientList ~pd ~expr ~delimiter)
+          `(.recipientList ~pd ~expr))
+       ~@(core-when (some? agg-strategy) `((.aggregationStrategy ~agg-strategy)))
+       ~@(core-when parallel-processing
+           `((.parallelProcessing)))
+       ~@(concat body `((.end))))))
+
+(defn endpoint
+  "Resolves the given name to an Endpoint of the specified type.
+  If the name has a singleton endpoint registered, then the singleton is returned.
+  Otherwise, a new Endpoint is created and registered in the EndpointRegistry."
+  [^Exchange exchange uri]
+  (-> (.getContext exchange)
+      (.getEndpoint uri)))
+
+(defn receive-no-wait
+  "Receives from the endpoint, not waiting for a response if non exists."
+  [^ConsumerTemplate consumer ^String uri]
+  (.receiveNoWait consumer uri))
+
+(defmacro delay
+  "Delayer EIP:  Creates a delayer allowing you to delay the delivery of messages to some destination."
+  [^ProcessorDefinition pd ^Long delay-in-ms & body]
+  `(-> (.delay pd ~delay-in-ms)
+       ~@(concat body `((.end)))))
+
+(defn end
+  "Ends the current block"
+  [^ProcessorDefinition pd]
+  (.end pd))
+
+(defn on-when
+  "Sets an additional predicate that should be true before the onCompletion is triggered.
+  To be used for fine grained controlling whether a completion callback should be invoked or not"
+  [^OnCompletionDefinition pd ^Predicate p]
+  (.onWhen pd p))
+
+(defn stop
+  "Stops continue routing the current Exchange and marks it as completed."
+  [^ProcessorDefinition pd]
+  (.stop pd))
+
+(defmacro multicast
+  "Multicast EIP:  Multicasts messages to all its child outputs;
+  so that each processor and destination gets a copy of the original message to avoid the processors
+  interfering with each other."
+  [^ProcessorDefinition pd opts & body]
+  `(-> (.multicast pd)
+       ~@(core-when (:parallel-processing opts)
+           `((.parallelProcessing)))
+       ~@(concat body `((.end)))))

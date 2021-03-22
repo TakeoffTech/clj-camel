@@ -5,7 +5,7 @@
         <setBody id="1">
             <constant>test</constant>
         </setBody>
-        <throttle customId="true" asyncDelayed="false" id="1" timePeriodMillis="10000" rejectExecution="false">
+        <throttle asyncDelayed="false" id="1" timePeriodMillis="10000" rejectExecution="false">
             <expressionDefinition>20</expressionDefinition>
         </throttle>
         <log id="1" message="after throttling"/>
