@@ -19,6 +19,7 @@
   :target-path "target/%s"
 
   :source-paths ["src/main/clj"]
+  :java-source-paths ["src/main/java"]
   :test-paths ["src/test/clj" "src/test/resources"]
 
   :deploy-repositories [["clojars" {:url           "https://clojars.org/repo"
