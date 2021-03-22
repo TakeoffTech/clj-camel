@@ -590,7 +590,7 @@
 (defmacro delay
   "Delayer EIP:  Creates a delayer allowing you to delay the delivery of messages to some destination."
   [^ProcessorDefinition pd ^Long delay-in-ms & body]
-  `(-> (.delay pd ~delay-in-ms)
+  `(-> (.delay ~pd ~delay-in-ms)
        ~@(concat body `((.end)))))
 
 (defn end
@@ -614,7 +614,7 @@
   so that each processor and destination gets a copy of the original message to avoid the processors
   interfering with each other."
   [^ProcessorDefinition pd opts & body]
-  `(-> (.multicast pd)
+  `(-> (.multicast ~pd)
        ~@(core-when (:parallel-processing opts)
            `((.parallelProcessing)))
        ~@(concat body `((.end)))))
