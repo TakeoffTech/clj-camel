@@ -457,13 +457,13 @@
    (-> ex (.getIn) (.getBody clazz))))
 
 (defn get-in-header [^Exchange ex k]
-  (-> ex (.getIn) (.getHeader (name k))))
+  (-> ex (.getIn) (.getHeader (str k))))
 
 (defn set-in-body [^Exchange ex body]
   (-> ex .getIn (.setBody body)))
 
 (defn set-in-header [^Exchange ex k value]
-  (-> ex .getIn (.setHeader (name k) value)))
+  (-> ex .getIn (.setHeader (str k) value)))
 
 (defn debug-exchange-log [ex]
   (log/warn "------------------------------------------")
