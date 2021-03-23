@@ -52,6 +52,36 @@
     (.id (.to rd uri) id)
     (.to rd uri)))
 
+(defn get-endpoint-uri
+  "Get endpoint URI"
+  [^Exchange ex]
+  (-> ex .getFromEndpoint .getEndpointUri))
+
+(defn get-properties
+  "Useful for getting state inside processors"
+  [ex]
+  (-> ex (.getProperties)))
+
+(defn get-in-headers
+  "Useful for getting state inside processors"
+  [ex]
+  (-> ex (.getIn) (.getHeaders)))
+
+(defn get-in-body
+  ([^Exchange ex]
+   (-> ex (.getIn) (.getBody)))
+  ([^Exchange ex ^Class clazz]
+   (-> ex (.getIn) (.getBody clazz))))
+
+(defn get-in-header [^Exchange ex k]
+  (-> ex (.getIn) (.getHeader (str k))))
+
+(defn set-in-body [^Exchange ex body]
+  (-> ex .getIn (.setBody body)))
+
+(defn set-in-header [^Exchange ex k value]
+  (-> ex .getIn (.setHeader (str k) value)))
+
 (defn convert-body-to
   "Converts the IN message body to the specified type"
   [^RouteDefinition rd & [^Class clazz]]
@@ -80,14 +110,14 @@
   [f]
   (reify Processor
     (^void process [_ ^Exchange ex]
-      (let [{:keys [headers body]} (f (lazy-map {:headers    (camel-map (-> ex .getIn .getHeaders))
+      (let [{:keys [headers body]} (f (lazy-map {:headers    (camel-map (get-in-headers ex))
                                                  :properties (camel-map
                                                                (-> ex .getProperties))
-                                                 :body       (-> ex .getIn .getBody)}))]
+                                                 :body       (get-in-body ex)}))]
         (core-when headers
           (-> ex .getIn (.setHeaders (.m headers))))
         (core-when body
-          (-> ex .getIn (.setBody body)))))))
+          (set-in-body ex body))))))
 
 (defn process
   "Adds the custom processor to this destination whichcould be a final destination,
@@ -419,8 +449,8 @@
       (let [^Exception e (.getProperty ex Exchange/EXCEPTION_CAUGHT ^Class Exception)
             error-type (detect-error-type e)
             message (.getMessage e)]
-        (-> ex .getIn (.setHeaders {":error-type"  error-type
-                                    ":error-cause" message}))))))
+        (set-in-header ex :error-type error-type)
+        (set-in-header ex :error-cause message)))))
 
 (defn dead-letter [^RouteDefinition r & [^String uri {:keys [add-exception-message-to-header ;TODO think about more elegant handle map parameters
                                                              maximum-redeliveries
@@ -434,36 +464,6 @@
                            back-off-multiplier (.backOffMultiplier back-off-multiplier)
                            use-exponential-backoff (.useExponentialBackOff))]
     (.errorHandler r dl-builder)))
-
-(defn get-endpoint-uri
-  "Get endpoint URI"
-  [^Exchange ex]
-  (-> ex .getFromEndpoint .getEndpointUri))
-
-(defn get-properties
-  "Useful for getting state inside processors"
-  [ex]
-  (-> ex (.getProperties)))
-
-(defn get-in-headers
-  "Useful for getting state inside processors"
-  [ex]
-  (-> ex (.getIn) (.getHeaders)))
-
-(defn get-in-body
-  ([^Exchange ex]
-   (-> ex (.getIn) (.getBody)))
-  ([^Exchange ex ^Class clazz]
-   (-> ex (.getIn) (.getBody clazz))))
-
-(defn get-in-header [^Exchange ex k]
-  (-> ex (.getIn) (.getHeader (str k))))
-
-(defn set-in-body [^Exchange ex body]
-  (-> ex .getIn (.setBody body)))
-
-(defn set-in-header [^Exchange ex k value]
-  (-> ex .getIn (.setHeader (str k) value)))
 
 (defn debug-exchange-log [ex]
   (log/warn "------------------------------------------")
