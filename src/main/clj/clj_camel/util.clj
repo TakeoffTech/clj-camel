@@ -117,7 +117,7 @@
   [^SftpEndpoint endpoint ex & body]
   `(let [~'ops (.createRemoteFileOperations ~endpoint)]
      (try
-       (.connect ~'ops (.getConfiguration ~endpoint) ex)
+       (.connect ~'ops (.getConfiguration ~endpoint) ~ex)
        ~@body
        (finally
          (.disconnect ~'ops)))))
