@@ -370,6 +370,7 @@
   (c/aggregate (c/constant 1) c/grouped-body-strategy
                {:completion-size      1000
                 :completion-timeout   1000
+                :completion-from-batch-consumer true
                 :completion-predicate (c/predicate (fn [_] true))})
   (c/to 'direct:result')
   ...
@@ -378,11 +379,13 @@
   (let [{:keys [completion-size
                 completion-timeout
                 parallel-processing
+                completion-from-batch-consumer
                 completion-predicate]} opts]
     `(-> (.aggregate ~pd ~expression ~strategy)
          ~@(core-when (some? completion-size) `((.completionSize ~completion-size)))
          ~@(core-when (some? completion-timeout) `((.completionTimeout ~completion-timeout)))
          ~@(core-when (some? parallel-processing) `((.parallelProcessing ~parallel-processing)))
+         ~@(core-when (some? completion-from-batch-consumer) `((.completionFromBatchConsumer)))
          ~@(core-when (some? completion-predicate) `((.completionPredicate ~completion-predicate)))
          ~@(concat body `((.end))))))
 
