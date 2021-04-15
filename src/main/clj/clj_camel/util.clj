@@ -114,10 +114,10 @@
   "Creates scope with connection to Remote File Storage (e.g FTP)
    Out of scope connection is automatically closed
    Exposes variable ops in macro body"
-  [^SftpEndpoint endpoint & body]
+  [^SftpEndpoint endpoint ex & body]
   `(let [~'ops (.createRemoteFileOperations ~endpoint)]
      (try
-       (.connect ~'ops (.getConfiguration ~endpoint))
+       (.connect ~'ops (.getConfiguration ~endpoint) ex)
        ~@body
        (finally
          (.disconnect ~'ops)))))
