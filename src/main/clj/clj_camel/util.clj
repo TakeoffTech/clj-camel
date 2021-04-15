@@ -11,7 +11,7 @@
            (javax.cache.expiry CreatedExpiryPolicy Duration)
            (javax.cache Caching)
            (java.util.concurrent TimeUnit)
-           (org.apache.camel.component.file.remote SftpEndpoint RemoteFileOperations)
+           (org.apache.camel.component.file.remote SftpEndpoint RemoteFileOperations RemoteFileEndpoint)
            (utils MDCFromHeadersUnitOfWorkFactory PubSubAttributePropagationIntoHeadersPolicyFactory)))
 
 (defn create-jcache-expiration-policy [cache-name ^long seconds]
@@ -99,7 +99,7 @@
 
 (defn full-path
   "Get full path of GenericFileConfiguration"
-  [^SftpEndpoint endpoint file-name]
+  [^RemoteFileEndpoint endpoint file-name]
   (-> endpoint
       (.getConfiguration)
       (.getDirectory)
@@ -114,7 +114,7 @@
   "Creates scope with connection to Remote File Storage (e.g FTP)
    Out of scope connection is automatically closed
    Exposes variable ops in macro body"
-  [^SftpEndpoint endpoint ex & body]
+  [^RemoteFileEndpoint endpoint ex & body]
   `(let [~'ops (.createRemoteFileOperations ~endpoint)]
      (try
        (.connect ~'ops (.getConfiguration ~endpoint) ~ex)
