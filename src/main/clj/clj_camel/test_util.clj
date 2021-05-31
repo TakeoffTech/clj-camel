@@ -1,8 +1,7 @@
 (ns clj-camel.test-util
   (:require [clj-camel.core :as c])
-  (:import (org.apache.camel.builder AdviceWithRouteBuilder RouteBuilder)
+  (:import (org.apache.camel.builder AdviceWithRouteBuilder RouteBuilder AdviceWith)
            (org.apache.camel.model InterceptSendToEndpointDefinition)
-           (org.apache.camel.reifier RouteReifier)
            (org.apache.camel.impl DefaultCamelContext)))
 
 (defmacro mock-camel-endpoint
@@ -34,4 +33,4 @@
 (defn advice-route-with
   "Advices this route with the route builder."
   [ctx name uri processor]
-  (RouteReifier/adviceWith (.getRouteDefinition ctx name) ctx (mock-endpoint uri processor)))
+  (AdviceWith/adviceWith (.getRouteDefinition ctx name) ctx (mock-endpoint uri processor)))
