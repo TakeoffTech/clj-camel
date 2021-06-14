@@ -6,7 +6,7 @@
             <constant>x-token</constant>
         </setBody>
         <log id="1" message="x-token requested: ${body}"/>
-        <recipientList delimiter=";" id="1" parallelProcessing="true">
+        <recipientList delimiter=";" id="1" parallelProcessing="true" ignoreInvalidEndpoints="true">
             <jsonpath>$.data.*</jsonpath>
         </recipientList>
         <setBody id="1">

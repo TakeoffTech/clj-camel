@@ -13,7 +13,8 @@
                               (c/set-body (c/constant "x-token"))
                               (c/log "x-token requested: ${body}")
                               (c/recipient-list (c/json-path "$.data.*") {:parallel-processing true
-                                                                          :delimiter           ";"}
+                                                                          :delimiter           ";"
+                                                                          :ignore-invalid-endpoints true}
                                 (c/set-body (c/constant "result2")))
                               (c/log "Populate cache with ${body}")
                               (c/log "x-token result: ${body}")
