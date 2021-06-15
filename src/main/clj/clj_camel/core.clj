@@ -568,9 +568,10 @@
     parallel-processing - if true exchanges processed in parallel
     agg-strategy - aggregation strategy to use
     delimiter – a custom delimiter to use
+    ignore-invalid-endpoints - if true ignores the invalidate endpoint exception when try to create a producer with that endpoint
   Read more https://camel.apache.org/components/latest/eips/recipientList-eip.html"
   [^ProcessorDefinition pd ^Expression expr opts & body]
-  (let [{:keys [delimiter agg-strategy parallel-processing]} opts]
+  (let [{:keys [delimiter agg-strategy parallel-processing ignore-invalid-endpoints]} opts]
     `(->
        ~(if delimiter
           `(.recipientList ~pd ~expr ~delimiter)
@@ -578,6 +579,8 @@
        ~@(core-when (some? agg-strategy) `((.aggregationStrategy ~agg-strategy)))
        ~@(core-when parallel-processing
            `((.parallelProcessing)))
+       ~@(core-when ignore-invalid-endpoints
+           `((.ignoreInvalidEndpoints)))
        ~@(concat body `((.end))))))
 
 (defn endpoint
@@ -618,9 +621,15 @@
 (defmacro multicast
   "Multicast EIP:  Multicasts messages to all its child outputs;
   so that each processor and destination gets a copy of the original message to avoid the processors
-  interfering with each other."
+  interfering with each other.
+  Options:
+    parallel-processing - if true exchanges processed in parallel
+    timeout - a total timeout specified in millis, when using parallel processing"
   [^ProcessorDefinition pd opts & body]
-  `(-> (.multicast ~pd)
-       ~@(core-when (:parallel-processing opts)
-           `((.parallelProcessing)))
-       ~@(concat body `((.end)))))
+  (let [{:keys [parallel-processing timeout]} opts]
+    `(-> (.multicast ~pd)
+         ~@(core-when parallel-processing
+             `((.parallelProcessing)))
+         ~@(core-when (some? timeout)
+             `((.timeout ~timeout)))
+         ~@(concat body `((.end))))))
