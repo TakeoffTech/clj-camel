@@ -82,6 +82,9 @@
 (defn set-in-header [^Exchange ex k value]
   (-> ex .getIn (.setHeader (str k) value)))
 
+(defn set-in-headers-from-wrapper [^Exchange ex wrapped-headers]
+  (-> ex .getIn (.setHeaders (.m wrapped-headers))))
+
 (defn convert-body-to
   "Converts the IN message body to the specified type"
   [^RouteDefinition rd & [^Class clazz]]
