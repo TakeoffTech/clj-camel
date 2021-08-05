@@ -115,7 +115,7 @@
     (^void process [_ ^Exchange ex]
       (let [{:keys [headers body]} (f (lazy-map {:headers    (camel-map (get-in-headers ex))
                                                  :properties (camel-map
-                                                               (-> ex .getProperties))
+                                                               (-> ex .getAllProperties))
                                                  :body       (get-in-body ex)}))]
         (core-when headers
           (-> ex .getIn (.setHeaders (.m headers))))
