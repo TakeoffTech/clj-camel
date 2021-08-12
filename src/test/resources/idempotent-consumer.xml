@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route customId="false" id="1">
+    <route id="1">
         <from uri="direct:test"/>
         <setBody id="1">
             <constant>test</constant>
