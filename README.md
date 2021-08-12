@@ -161,3 +161,9 @@ Specified pub-sub message attributes will be added to exchange header if exist
 ```clojure
 (c/set-pubsub-attributes-propagation context {"pubsub-attribute-name" "name-of-header-field"})
 ```
+
+## Apache Camel 3.8 -> 3.11 Migration Notes
+* authentication mechanism in google-pubsub-component was changed. `serviceAccountKey` become mandatory parameter in google pubsub endpoint string: https://camel.apache.org/components/3.11.x/google-pubsub-component.html#_authentication_configuration
+* changed interface of `Exchange` class: `getAllProperties` should be used instead of `getProperties` method
+* apm-opentracing dependencies may need to be updated
+* fasterxml/jackson dependencies may need to be updated 
