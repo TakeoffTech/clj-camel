@@ -52,6 +52,11 @@
     (.id (.to rd uri) id)
     (.to rd uri)))
 
+(defn to-d
+  "Sends the exchange to the given dynamic endpoint"
+  [^RouteDefinition rd & [^String uri]]
+  (.toD rd uri))
+
 (defn get-endpoint-uri
   "Get endpoint URI"
   [^Exchange ex]
