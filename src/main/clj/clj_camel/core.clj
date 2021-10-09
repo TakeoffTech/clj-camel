@@ -561,8 +561,14 @@
   `(-> (.otherwise ~cd)
        ~@body))
 
-(defn unmarshall
+(defn unmarshal
   "Unmarshals the in body using the specified DataFormat"
+  [^ProcessorDefinition pd & [^DataFormatDefinition data-format-definition]]
+  (.unmarshal pd data-format-definition))
+
+(defn ^:deprecated unmarshall
+  "Deprecated misspelling, keep for backward compatibility for existing
+  implementations."
   [^ProcessorDefinition pd & [^DataFormatDefinition data-format-definition]]
   (.unmarshal pd data-format-definition))
 
