@@ -7,3 +7,4 @@ All notable changes to this project will be documented in this file. This change
 
 [1.0.0]: https://github.com/TakeoffTech/clj-camel
 [2.0.0]: Migrated apache camel version from 3.8 to 3.11
+[2.0.1]: Added missing handlers
