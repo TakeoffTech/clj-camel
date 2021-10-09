@@ -626,6 +626,11 @@
   [^ProcessorDefinition pd]
   (.end pd))
 
+(defn end-choice
+  "Ends the current choice"
+  [^ChoiceDefinition cd]
+  (.endChoice cd))
+
 (defn on-when
   "Sets an additional predicate that should be true before the onCompletion is triggered.
   To be used for fine grained controlling whether a completion callback should be invoked or not"
