@@ -90,6 +90,11 @@
 (defn set-in-headers-from-wrapper [^Exchange ex wrapped-headers]
   (-> ex .getIn (.setHeaders (.m wrapped-headers))))
 
+(defn remove-headers
+  "Remove headers that match the specified pattern"
+  [^RouteDefinition rd & [^String pattern]]
+  (.removeHeaders rd pattern))
+
 (defn convert-body-to
   "Converts the IN message body to the specified type"
   [^RouteDefinition rd & [^Class clazz]]
