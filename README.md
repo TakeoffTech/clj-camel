@@ -162,6 +162,9 @@ Specified pub-sub message attributes will be added to exchange header if exist
 (c/set-pubsub-attributes-propagation context {"pubsub-attribute-name" "name-of-header-field"})
 ```
 
+## Logging Configuration
+When configuring your logging appenders, contrary to the Camel documentation, you will need to add `clj-camel.core` as your logging namespace.
+
 ## Apache Camel 3.8 -> 3.11 Migration Notes
 * authentication mechanism in google-pubsub-component was changed. `serviceAccountKey` become mandatory parameter in google pubsub endpoint string: https://camel.apache.org/components/3.11.x/google-pubsub-component.html#_authentication_configuration
 * changed interface of `Exchange` class: `getAllProperties` should be used instead of `getProperties` method

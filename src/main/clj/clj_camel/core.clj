@@ -52,6 +52,11 @@
     (.id (.to rd uri) id)
     (.to rd uri)))
 
+(defn to-d
+  "Sends the exchange to the given dynamic endpoint"
+  [^RouteDefinition rd & [^String uri]]
+  (.toD rd uri))
+
 (defn get-endpoint-uri
   "Get endpoint URI"
   [^Exchange ex]
@@ -84,6 +89,11 @@
 
 (defn set-in-headers-from-wrapper [^Exchange ex wrapped-headers]
   (-> ex .getIn (.setHeaders (.m wrapped-headers))))
+
+(defn remove-headers
+  "Remove headers that match the specified pattern"
+  [^RouteDefinition rd & [^String pattern]]
+  (.removeHeaders rd pattern))
 
 (defn convert-body-to
   "Converts the IN message body to the specified type"
@@ -551,8 +561,14 @@
   `(-> (.otherwise ~cd)
        ~@body))
 
-(defn unmarshall
+(defn unmarshal
   "Unmarshals the in body using the specified DataFormat"
+  [^ProcessorDefinition pd & [^DataFormatDefinition data-format-definition]]
+  (.unmarshal pd data-format-definition))
+
+(defn ^:deprecated unmarshall
+  "Deprecated misspelling, keep for backward compatibility for existing
+  implementations."
   [^ProcessorDefinition pd & [^DataFormatDefinition data-format-definition]]
   (.unmarshal pd data-format-definition))
 
@@ -609,6 +625,11 @@
   "Ends the current block"
   [^ProcessorDefinition pd]
   (.end pd))
+
+(defn end-choice
+  "Ends the current choice"
+  [^ChoiceDefinition cd]
+  (.endChoice cd))
 
 (defn on-when
   "Sets an additional predicate that should be true before the onCompletion is triggered.
