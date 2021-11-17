@@ -566,12 +566,6 @@
   [^ProcessorDefinition pd & [^DataFormatDefinition data-format-definition]]
   (.unmarshal pd data-format-definition))
 
-(defn ^:deprecated unmarshall
-  "Deprecated misspelling, keep for backward compatibility for existing
-  implementations."
-  [^ProcessorDefinition pd & [^DataFormatDefinition data-format-definition]]
-  (.unmarshal pd data-format-definition))
-
 (defmacro on-completion
   "Adds a hook that invoke this route as a callback when the
    Exchange has finished being processed."
