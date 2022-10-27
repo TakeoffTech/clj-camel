@@ -57,6 +57,13 @@
   [^RouteDefinition rd & [^String uri]]
   (.toD rd uri))
 
+(defn wire-tap
+  "Sends a *copy* of the exchange to the given endpoint"
+  [^RouteDefinition rd & [^String uri {:keys [id]}]]
+  (if id
+    (.id (.wireTap rd uri) id)
+    (.wireTap rd uri)))
+
 (defn get-endpoint-uri
   "Get endpoint URI"
   [^Exchange ex]
