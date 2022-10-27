@@ -85,9 +85,9 @@ Aggregate ([original doc](https://camel.apache.org/components/latest/eips/aggreg
                  (c/aggregate (c/constant 1) c/grouped-body-strategy
                               {:completion-size      1000
                                :completion-timeout   1000
-                               :completion-predicate (c/predicate (fn [_] true))})
-                 (c/log "after aggregating")
-                 (c/to "direct:result"))
+                               :completion-predicate (c/predicate (fn [_] true))}
+                              (c/to "direct:result"))
+                 (c/log "after aggregating"))
 ```
 
 Caching ([original doc](https://camel.apache.org/components/latest/jcache-component.html))
