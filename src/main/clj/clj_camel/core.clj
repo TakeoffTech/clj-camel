@@ -57,6 +57,13 @@
   [^RouteDefinition rd & [^String uri]]
   (.toD rd uri))
 
+(defn wire-tap
+  "Sends a *copy* of the exchange to the given endpoint"
+  [^RouteDefinition rd & [^String uri {:keys [id]}]]
+  (if id
+    (.id (.wireTap rd uri) id)
+    (.wireTap rd uri)))
+
 (defn get-endpoint-uri
   "Get endpoint URI"
   [^Exchange ex]
@@ -383,14 +390,16 @@
   (c/aggregate (c/constant 1) c/grouped-body-strategy
                {:completion-size      1000
                 :completion-timeout   1000
+                :completion-interval  1000
                 :completion-from-batch-consumer true
                 :eager-check-completion true
-                :completion-predicate (c/predicate (fn [_] true))})
-  (c/to 'direct:result')
+                :completion-predicate (c/predicate (fn [_] true))}
+               (c/to 'direct:result'))
   ...
   "
   [^ProcessorDefinition pd ^Expression expression ^AggregationStrategy strategy opts & body]
   (let [{:keys [completion-size
+                completion-interval
                 completion-timeout
                 parallel-processing
                 completion-from-batch-consumer
@@ -398,6 +407,7 @@
                 completion-predicate]} opts]
     `(-> (.aggregate ~pd ~expression ~strategy)
          ~@(core-when (some? completion-size) `((.completionSize ~completion-size)))
+         ~@(core-when (some? completion-interval) `((.completionInterval ~completion-interval)))
          ~@(core-when (some? completion-timeout) `((.completionTimeout ~completion-timeout)))
          ~@(core-when (some? parallel-processing) `((.parallelProcessing ~parallel-processing)))
          ~@(core-when (some? completion-from-batch-consumer) `((.completionFromBatchConsumer)))

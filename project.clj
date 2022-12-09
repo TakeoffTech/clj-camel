@@ -1,6 +1,6 @@
 (def camel-version "3.13.0")
 
-(defproject takeoff/clj-camel "2.1.0"
+(defproject takeoff/clj-camel "2.2.0"
   :description "Clojure wrapper for Apache Camel"
   :url "https://github.com/TakeoffTech/clj-camel"
   :license {:name "Apache License Version 2.0"
